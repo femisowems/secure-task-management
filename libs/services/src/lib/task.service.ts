@@ -19,13 +19,22 @@ export class TaskService {
   isLoading = this._loading.asReadonly();
   error = this._error.asReadonly();
 
+  todoTasks = computed(() => this.tasks().filter(t => t.status === TaskStatus.TODO));
+  scheduledTasks = computed(() => this.tasks().filter(t => t.status === TaskStatus.SCHEDULED));
+  inProgressTasks = computed(() => this.tasks().filter(t => t.status === TaskStatus.IN_PROGRESS));
+  blockedTasks = computed(() => this.tasks().filter(t => t.status === TaskStatus.BLOCKED));
+  completedTasks = computed(() => this.tasks().filter(t => t.status === TaskStatus.COMPLETED));
+  archivedTasks = computed(() => this.tasks().filter(t => t.status === TaskStatus.ARCHIVED));
+
   taskStats = computed(() => {
     const tasks = this.tasks();
     return {
-      todo: tasks.filter((t) => t.status === TaskStatus.TODO).length,
-      inProgress: tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS)
-        .length,
-      completed: tasks.filter((t) => t.status === TaskStatus.COMPLETED).length,
+      todo: this.todoTasks().length,
+      scheduled: this.scheduledTasks().length,
+      inProgress: this.inProgressTasks().length,
+      blocked: this.blockedTasks().length,
+      completed: this.completedTasks().length,
+      archived: this.archivedTasks().length,
       total: tasks.length,
     };
   });

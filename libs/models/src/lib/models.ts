@@ -17,8 +17,11 @@ export interface User {
 
 export enum TaskStatus {
   TODO = 'todo',
+  SCHEDULED = 'scheduled',
   IN_PROGRESS = 'in-progress',
+  BLOCKED = 'blocked',
   COMPLETED = 'completed',
+  ARCHIVED = 'archived',
 }
 
 export enum TaskCategory {

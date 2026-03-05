@@ -1,24 +1,24 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { Task, TaskCategory, TaskPriority, TaskStatus } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
+import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
 
 @Component({
   selector: 'app-task-card',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, BadgeComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-grab hover:shadow-lg hover:border-indigo-100 dark:hover:border-indigo-900 transition-all active:cursor-grabbing group"
       [class.opacity-80]="task.status === TaskStatus.COMPLETED"
     >
       <div class="flex flex-col gap-2 lg:gap-3">
-        <div class="flex justify-between items-start">
-          <span
-            [class]="'px-2 py-0.5 lg:px-2.5 lg:py-1 text-[10px] font-bold uppercase rounded-md tracking-wider ' + getCategoryClass(task.category)"
-          >
-            {{ getCategoryLabel(task.category) }}
-          </span>
+        <div class="flex items-start justify-between mb-4">
+          <app-badge [variant]="getCategoryVariant(task.category)">
+            {{ task.category }}
+          </app-badge>
           @if (task.priority && task.status !== TaskStatus.COMPLETED) {
             <span
               [class]="'text-[10px] font-bold uppercase tracking-wider ' + getPriorityColor(task.priority)"
@@ -74,6 +74,27 @@ export class TaskCardComponent {
   @Output() edit = new EventEmitter<Task>();
   @Output() delete = new EventEmitter<string>();
   TaskStatus = TaskStatus;
+
+  getCategoryVariant(category: TaskCategory): BadgeVariant {
+    switch (category) {
+      case TaskCategory.WORK: return 'primary';
+      case TaskCategory.PERSONAL: return 'success';
+      case TaskCategory.SHOPPING: return 'warning';
+      default: return 'default';
+    }
+  }
+
+  getStatusVariant(status: TaskStatus): BadgeVariant {
+    switch (status) {
+      case TaskStatus.TODO: return 'default';
+      case TaskStatus.SCHEDULED: return 'purple';
+      case TaskStatus.IN_PROGRESS: return 'info';
+      case TaskStatus.BLOCKED: return 'error';
+      case TaskStatus.COMPLETED: return 'success';
+      case TaskStatus.ARCHIVED: return 'default';
+      default: return 'default';
+    }
+  }
 
   getCategoryLabel(category: TaskCategory): string {
     const labels: Record<TaskCategory, string> = {

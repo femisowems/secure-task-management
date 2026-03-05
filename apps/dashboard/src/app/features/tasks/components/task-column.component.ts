@@ -1,13 +1,15 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Task, TaskStatus } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 import { TaskCardComponent } from './task-card.component';
+import { BadgeComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
 
 @Component({
   selector: 'app-task-column',
   standalone: true,
-  imports: [CommonModule, DragDropModule, TaskCardComponent],
+  imports: [CommonModule, DragDropModule, TaskCardComponent, BadgeComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="w-[300px] sm:w-[340px] lg:w-auto flex flex-col h-full rounded-2xl p-4 lg:p-5 border shadow-sm shrink-0 snap-center"
@@ -23,11 +25,9 @@ import { TaskCardComponent } from './task-card.component';
             {{ title }}
           </h2>
         </div>
-        <span
-          class="bg-white dark:bg-slate-700 px-2.5 py-1 rounded-lg border text-xs font-bold shadow-sm"
-          [ngClass]="countClass"
-          >{{ tasks.length }}</span
-        >
+        <app-badge [variant]="getBadgeVariant()">
+          {{ tasks.length }}
+        </app-badge>
       </div>
 
       <div
@@ -70,5 +70,17 @@ export class TaskColumnComponent {
 
   onDrop(event: CdkDragDrop<Task[]>) {
     this.drop.emit(event);
+  }
+
+  getBadgeVariant(): any {
+    switch (this.status) {
+      case TaskStatus.TODO: return 'default';
+      case TaskStatus.SCHEDULED: return 'purple';
+      case TaskStatus.IN_PROGRESS: return 'info';
+      case TaskStatus.BLOCKED: return 'error';
+      case TaskStatus.COMPLETED: return 'success';
+      case TaskStatus.ARCHIVED: return 'default';
+      default: return 'default';
+    }
   }
 }

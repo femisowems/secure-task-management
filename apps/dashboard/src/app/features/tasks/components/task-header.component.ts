@@ -1,13 +1,15 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { ButtonComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
 import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 
 @Component({
   selector: 'app-task-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6"
@@ -76,13 +78,16 @@ import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/mo
             </div>
           </div>
 
-          <button
-            (click)="create.emit()"
-            class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 lg:px-6 h-11 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-95 whitespace-nowrap"
-          >
-            <lucide-icon name="plus" [size]="18"></lucide-icon>
-            New Task
-          </button>
+          @if (canCreate) {
+            <app-button
+              (btnClick)="create.emit()"
+              variant="primary"
+              customClass="w-full lg:w-auto shadow-indigo-100 dark:shadow-none"
+            >
+              <lucide-icon name="plus" [size]="18" class="mr-2"></lucide-icon>
+              <span>Create New Task</span>
+            </app-button>
+          }
         </div>
 
         <div
@@ -91,7 +96,7 @@ import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/mo
           <span>Shortcut:</span>
           <kbd
             class="px-1.5 py-0.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded shadow-sm font-bold text-slate-600 dark:text-slate-300"
-            >?</kbd
+          >?</kbd
           >
         </div>
       </div>
@@ -106,6 +111,7 @@ import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/mo
 export class TaskHeaderComponent {
   @Input() searchQuery = '';
   @Input() categoryFilter: TaskCategory | 'all' = 'all';
+  @Input() canCreate = true;
   @Output() searchQueryChange = new EventEmitter<string>();
   @Output() categoryFilterChange = new EventEmitter<TaskCategory | 'all'>();
   @Output() create = new EventEmitter<void>();

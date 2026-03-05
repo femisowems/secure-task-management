@@ -192,8 +192,11 @@ export class TaskFormComponent implements OnInit {
   public getStatusLabel(status: TaskStatus): string {
     const labels: Record<TaskStatus, string> = {
       [TaskStatus.TODO]: 'To Do',
+      [TaskStatus.SCHEDULED]: 'Scheduled',
       [TaskStatus.IN_PROGRESS]: 'In Progress',
+      [TaskStatus.BLOCKED]: 'Blocked',
       [TaskStatus.COMPLETED]: 'Completed',
+      [TaskStatus.ARCHIVED]: 'Archived',
     };
     return labels[status];
   }

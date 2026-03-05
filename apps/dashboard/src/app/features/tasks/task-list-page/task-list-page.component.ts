@@ -4,6 +4,7 @@ import {
   OnInit,
   signal,
   computed,
+  ChangeDetectionStrategy,
   ViewChild,
   ElementRef,
   OnDestroy,
@@ -26,6 +27,7 @@ import { TaskAnalyticsComponent } from '../../analytics/task-analytics.component
 import { ShortcutsModalComponent } from '../../../shared/components/shortcuts-modal.component';
 import { TaskHeaderComponent } from '../components/task-header.component';
 import { TaskColumnComponent } from '../components/task-column.component';
+import { CardComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
 // KeyboardShortcutsService moved above
 
 type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
@@ -43,7 +45,9 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
     TaskFormComponent,
     TaskAnalyticsComponent,
     ShortcutsModalComponent,
+    CardComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="max-w-7xl mx-auto space-y-6 lg:space-y-10 px-4 py-6 lg:py-8">
         <!-- Kanban Board Area with Horizontal Scroll on Mobile -->
@@ -77,43 +81,85 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
             class="overflow-x-auto pb-6 -mx-4 px-4 lg:overflow-visible lg:pb-0 lg:px-0 snap-x snap-mandatory scroll-pl-4"
           >
             <div
-              class="flex lg:grid lg:grid-cols-3 gap-4 lg:gap-8 min-w-[max-content] lg:min-w-0"
+              class="flex pb-6 overflow-x-auto gap-6 snap-x touch-pan-x scroll-smooth no-scrollbar select-none"
               cdkDropListGroup
             >
               <app-task-column
-                [title]="getStatusLabel(statusMap.TODO)"
-                [status]="statusMap.TODO"
+                [title]="getStatusLabel(TaskStatus.TODO)"
+                [status]="TaskStatus.TODO"
                 [tasks]="todoTasks()"
                 [canEdit]="canEdit()"
-                (drop)="drop($event, statusMap.TODO)"
+                (drop)="drop($event, TaskStatus.TODO)"
                 (edit)="openEdit($event)"
                 (delete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
-                [title]="getStatusLabel(statusMap.IN_PROGRESS)"
-                [status]="statusMap.IN_PROGRESS"
+                [title]="getStatusLabel(TaskStatus.SCHEDULED)"
+                [status]="TaskStatus.SCHEDULED"
+                [tasks]="scheduledTasks()"
+                [canEdit]="canEdit()"
+                containerClass="bg-purple-50/40 dark:bg-purple-900/10 border-purple-100/50 dark:border-purple-800/30"
+                dotClass="bg-purple-500"
+                titleClass="text-purple-900 dark:text-purple-300"
+                countClass="border-purple-100 dark:border-purple-900 text-purple-600 dark:text-purple-300"
+                (drop)="drop($event, TaskStatus.SCHEDULED)"
+                (edit)="openEdit($event)"
+                (delete)="deleteTask($event)"
+              ></app-task-column>
+
+              <app-task-column
+                [title]="getStatusLabel(TaskStatus.IN_PROGRESS)"
+                [status]="TaskStatus.IN_PROGRESS"
                 [tasks]="inProgressTasks()"
                 [canEdit]="canEdit()"
                 containerClass="bg-blue-50/40 dark:bg-blue-900/10 border-blue-100/50 dark:border-blue-800/30"
                 dotClass="bg-blue-500 animate-pulse"
                 titleClass="text-blue-900 dark:text-blue-300"
                 countClass="border-blue-100 dark:border-blue-900 text-blue-600 dark:text-blue-300"
-                (drop)="drop($event, statusMap.IN_PROGRESS)"
+                (drop)="drop($event, TaskStatus.IN_PROGRESS)"
                 (edit)="openEdit($event)"
                 (delete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
-                [title]="getStatusLabel(statusMap.COMPLETED)"
-                [status]="statusMap.COMPLETED"
+                [title]="getStatusLabel(TaskStatus.BLOCKED)"
+                [status]="TaskStatus.BLOCKED"
+                [tasks]="blockedTasks()"
+                [canEdit]="canEdit()"
+                containerClass="bg-red-50/40 dark:bg-red-900/10 border-red-100/50 dark:border-red-800/30"
+                dotClass="bg-red-500"
+                titleClass="text-red-900 dark:text-red-300"
+                countClass="border-red-100 dark:border-red-900 text-red-600 dark:text-red-300"
+                (drop)="drop($event, TaskStatus.BLOCKED)"
+                (edit)="openEdit($event)"
+                (delete)="deleteTask($event)"
+              ></app-task-column>
+
+              <app-task-column
+                [title]="getStatusLabel(TaskStatus.COMPLETED)"
+                [status]="TaskStatus.COMPLETED"
                 [tasks]="completedTasks()"
                 [canEdit]="canEdit()"
                 containerClass="bg-green-50/40 dark:bg-green-900/10 border-green-100/50 dark:border-green-800/30"
                 dotClass="bg-green-500"
                 titleClass="text-green-900 dark:text-green-300"
                 countClass="border-green-100 dark:border-green-900 text-green-600 dark:text-green-300"
-                (drop)="drop($event, statusMap.COMPLETED)"
+                (drop)="drop($event, TaskStatus.COMPLETED)"
+                (edit)="openEdit($event)"
+                (delete)="deleteTask($event)"
+              ></app-task-column>
+
+              <app-task-column
+                [title]="getStatusLabel(TaskStatus.ARCHIVED)"
+                [status]="TaskStatus.ARCHIVED"
+                [tasks]="archivedTasks()"
+                [canEdit]="canEdit()"
+                containerClass="bg-slate-100/40 dark:bg-slate-900/10 border-slate-200/50 dark:border-slate-800/30"
+                dotClass="bg-slate-500"
+                titleClass="text-slate-900 dark:text-slate-300"
+                countClass="border-slate-200 dark:border-slate-900 text-slate-600 dark:text-slate-300"
+                (drop)="drop($event, TaskStatus.ARCHIVED)"
                 (edit)="openEdit($event)"
                 (delete)="deleteTask($event)"
               ></app-task-column>
@@ -123,10 +169,12 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
 
       @if (isModalOpen()) {
         <div
-          class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200"
         >
-          <div
-            class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg p-10 relative shadow-2xl border border-slate-200 dark:border-slate-700 animate-in zoom-in duration-200"
+          <app-card
+            [title]="editingTask() ? 'Update Task' : 'Create New Task'"
+            [subtitle]="'Fill in the details below to ' + (editingTask() ? 'edit your' : 'start a') + ' task.'"
+            customClass="w-full max-w-lg shadow-2xl relative animate-in zoom-in duration-200"
           >
             <button
               (click)="isModalOpen.set(false)"
@@ -134,15 +182,6 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
             >
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
-            <div class="mb-8">
-              <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
-                {{ editingTask() ? 'Update Task' : 'Create New Task' }}
-              </h2>
-              <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
-                Fill in the details below to
-                {{ editingTask() ? 'edit your' : 'start a' }} task.
-              </p>
-            </div>
 
             <app-task-form
               [task]="editingTask() || undefined"
@@ -151,7 +190,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
               "
               (formCancel)="isModalOpen.set(false)"
             ></app-task-form>
-          </div>
+          </app-card>
         </div>
       }
     </div>
@@ -249,18 +288,16 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
     return result;
   });
 
-  todoTasks = computed(() =>
-    this.filteredTasks().filter((t) => t.status === TaskStatus.TODO),
-  );
-  inProgressTasks = computed(() =>
-    this.filteredTasks().filter((t) => t.status === TaskStatus.IN_PROGRESS),
-  );
-  completedTasks = computed(() =>
-    this.filteredTasks().filter((t) => t.status === TaskStatus.COMPLETED),
-  );
+  todoTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.TODO));
+  scheduledTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.SCHEDULED));
+  inProgressTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.IN_PROGRESS));
+  blockedTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.BLOCKED));
+  completedTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.COMPLETED));
+  archivedTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.ARCHIVED));
 
   isModalOpen = signal(false);
   editingTask = signal<Task | null>(null);
+  TaskStatus = TaskStatus;
 
   priorities = Object.values(TaskPriority);
 
@@ -276,10 +313,13 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
 
   public getStatusLabel(status: TaskStatus): string {
     const labels: Record<TaskStatus, string> = {
-      [TaskStatus.TODO]: 'To Do',
-      [TaskStatus.IN_PROGRESS]: 'In Progress',
-      [TaskStatus.COMPLETED]: 'Completed',
-    };
+    [TaskStatus.TODO]: 'To Do',
+    [TaskStatus.SCHEDULED]: 'Scheduled',
+    [TaskStatus.IN_PROGRESS]: 'In Progress',
+    [TaskStatus.BLOCKED]: 'Blocked',
+    [TaskStatus.COMPLETED]: 'Completed',
+    [TaskStatus.ARCHIVED]: 'Archived',
+  };
     return labels[status] || status;
   }
 
