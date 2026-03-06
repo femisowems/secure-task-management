@@ -93,6 +93,7 @@
     --container-xs: 20rem;
     --container-md: 28rem;
     --container-lg: 32rem;
+    --container-2xl: 42rem;
     --container-4xl: 56rem;
     --container-7xl: 80rem;
     --text-xs: 0.75rem;
@@ -390,24 +391,6 @@
   .z-\[100\] {
     z-index: 100;
   }
-  .container {
-    width: 100%;
-    @media (width >= 40rem) {
-      max-width: 40rem;
-    }
-    @media (width >= 48rem) {
-      max-width: 48rem;
-    }
-    @media (width >= 64rem) {
-      max-width: 64rem;
-    }
-    @media (width >= 80rem) {
-      max-width: 80rem;
-    }
-    @media (width >= 96rem) {
-      max-width: 96rem;
-    }
-  }
   .-mx-4 {
     margin-inline: calc(var(--spacing) * -4);
   }
@@ -425,6 +408,9 @@
   }
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
+  }
+  .mt-5 {
+    margin-top: calc(var(--spacing) * 5);
   }
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
@@ -452,6 +438,9 @@
   }
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
+  }
+  .mb-5 {
+    margin-bottom: calc(var(--spacing) * 5);
   }
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
@@ -488,6 +477,9 @@
   }
   .hidden {
     display: none;
+  }
+  .inline {
+    display: inline;
   }
   .inline-block {
     display: inline-block;
@@ -567,6 +559,9 @@
   .w-full {
     width: 100%;
   }
+  .max-w-2xl {
+    max-width: var(--container-2xl);
+  }
   .max-w-4xl {
     max-width: var(--container-4xl);
   }
@@ -584,9 +579,6 @@
   }
   .min-w-full {
     min-width: 100%;
-  }
-  .min-w-min {
-    min-width: min-content;
   }
   .flex-1 {
     flex: 1;
@@ -638,6 +630,9 @@
   .snap-x {
     scroll-snap-type: x var(--tw-scroll-snap-strictness);
   }
+  .snap-mandatory {
+    --tw-scroll-snap-strictness: mandatory;
+  }
   .snap-center {
     scroll-snap-align: center;
   }
@@ -676,9 +671,6 @@
   }
   .justify-end {
     justify-content: flex-end;
-  }
-  .gap-1\.5 {
-    gap: calc(var(--spacing) * 1.5);
   }
   .gap-2 {
     gap: calc(var(--spacing) * 2);
@@ -919,6 +911,9 @@
       border-color: color-mix(in oklab, var(--color-green-100) 50%, transparent);
     }
   }
+  .border-indigo-200 {
+    border-color: var(--color-indigo-200);
+  }
   .border-indigo-500 {
     border-color: var(--color-indigo-500);
   }
@@ -1035,6 +1030,9 @@
   }
   .bg-indigo-100 {
     background-color: var(--color-indigo-100);
+  }
+  .bg-indigo-500 {
+    background-color: var(--color-indigo-500);
   }
   .bg-indigo-600 {
     background-color: var(--color-indigo-600);
@@ -1159,6 +1157,9 @@
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
+  }
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
@@ -1225,6 +1226,9 @@
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
   }
+  .py-1\.5 {
+    padding-block: calc(var(--spacing) * 1.5);
+  }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
   }
@@ -1251,6 +1255,9 @@
   }
   .py-grid-sm {
     padding-block: var(--spacing-grid-sm);
+  }
+  .pt-4 {
+    padding-top: calc(var(--spacing) * 4);
   }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
@@ -1985,6 +1992,11 @@
       }
     }
   }
+  .lg\:overflow-visible {
+    @media (width >= 64rem) {
+      overflow: visible;
+    }
+  }
   .lg\:p-2 {
     @media (width >= 64rem) {
       padding: calc(var(--spacing) * 2);
@@ -2000,9 +2012,19 @@
       padding: calc(var(--spacing) * 8);
     }
   }
+  .lg\:px-0 {
+    @media (width >= 64rem) {
+      padding-inline: calc(var(--spacing) * 0);
+    }
+  }
   .lg\:py-8 {
     @media (width >= 64rem) {
       padding-block: calc(var(--spacing) * 8);
+    }
+  }
+  .lg\:pb-0 {
+    @media (width >= 64rem) {
+      padding-bottom: calc(var(--spacing) * 0);
     }
   }
   .lg\:text-3xl {
@@ -2252,6 +2274,11 @@
       }
     }
   }
+  .dark\:bg-slate-900 {
+    @media (prefers-color-scheme: dark) {
+      background-color: var(--color-slate-900);
+    }
+  }
   .dark\:bg-slate-900\/10 {
     @media (prefers-color-scheme: dark) {
       background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 10%, transparent);
@@ -2383,6 +2410,15 @@
           @supports (color: color-mix(in lab, red, red)) {
             background-color: color-mix(in oklab, var(--color-red-900) 50%, transparent);
           }
+        }
+      }
+    }
+  }
+  .dark\:hover\:bg-slate-600 {
+    @media (prefers-color-scheme: dark) {
+      &:hover {
+        @media (hover: hover) {
+          background-color: var(--color-slate-600);
         }
       }
     }

@@ -1,6 +1,8 @@
 import { Injectable, signal, OnDestroy } from '@angular/core';
 import { Subject, fromEvent, takeUntil } from 'rxjs';
 
+export type HelpModalType = 'shortcuts' | 'column-guide';
+
 export interface ShortcutAction {
   key: string;
   description: string;
@@ -15,7 +17,9 @@ export class KeyboardShortcutsService implements OnDestroy {
   private destroy$ = new Subject<void>();
   private shortcuts: ShortcutAction[] = [];
 
-  isModalOpen = signal(false);
+  activeHelpModal = signal<HelpModalType | null>(null);
+  // Backward-compatible alias used by existing shortcuts modal checks.
+  isModalOpen = () => this.activeHelpModal() === 'shortcuts';
 
   constructor() {
     this.setupGlobalListeners();
@@ -42,12 +46,12 @@ export class KeyboardShortcutsService implements OnDestroy {
 
         if (shortcut) {
           event.preventDefault();
-          this.isModalOpen.set(false);
+          this.closeHelpModal();
           shortcut.action();
         }
 
         if (event.key === '?') {
-          this.toggleHelpModal();
+          this.toggleHelpModal('shortcuts');
         }
       });
   }
@@ -68,8 +72,16 @@ export class KeyboardShortcutsService implements OnDestroy {
     return this.shortcuts;
   }
 
-  toggleHelpModal() {
-    this.isModalOpen.update((v) => !v);
+  toggleHelpModal(type: HelpModalType = 'shortcuts') {
+    this.activeHelpModal.update((current) => (current === type ? null : type));
+  }
+
+  closeHelpModal() {
+    this.activeHelpModal.set(null);
+  }
+
+  isHelpModalOpen(type: HelpModalType) {
+    return this.activeHelpModal() === type;
   }
 
   ngOnDestroy() {

@@ -71,11 +71,11 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
 
         <app-task-analytics></app-task-analytics>
 
-        @if (shortcutService.isModalOpen()) {
+        @if (shortcutService.isHelpModalOpen('shortcuts')) {
           <app-shortcuts-modal></app-shortcuts-modal>
         }
 
-        @if (isColumnGuideModalOpen()) {
+        @if (shortcutService.isHelpModalOpen('column-guide')) {
           <div
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]"
             (click)="toggleColumnGuideModal()"
@@ -375,7 +375,6 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
   editingTask = signal<Task | null>(null);
   TaskStatus = TaskStatus;
   showArchived = signal(false);
-  isColumnGuideModalOpen = signal(false);
 
   priorities = Object.values(TaskPriority);
 
@@ -434,7 +433,7 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
   }
 
   toggleColumnGuideModal() {
-    this.isColumnGuideModalOpen.update((v) => !v);
+    this.shortcutService.toggleHelpModal('column-guide');
   }
 
   toggleArchived() {

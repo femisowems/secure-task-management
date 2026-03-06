@@ -116,6 +116,6 @@ export class ShortcutsModalComponent {
   }
 
   close() {
-    this.shortcutService.isModalOpen.set(false);
+    this.shortcutService.closeHelpModal();
   }
 }
