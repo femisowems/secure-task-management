@@ -45,6 +45,13 @@ import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953
           @if (canEdit) {
             <div class="flex gap-2">
               <button
+                (click)="duplicate.emit(task)"
+                class="p-1.5 lg:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-lg transition-all"
+                title="Duplicate Task"
+              >
+                <lucide-icon name="copy" [size]="14"></lucide-icon>
+              </button>
+              <button
                 (click)="edit.emit(task)"
                 class="p-1.5 lg:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-lg transition-all"
               >
@@ -72,6 +79,7 @@ export class TaskCardComponent {
   @Input({ required: true }) task!: Task;
   @Input() canEdit = true;
   @Output() edit = new EventEmitter<Task>();
+  @Output() duplicate = new EventEmitter<Task>();
   @Output() delete = new EventEmitter<string>();
   TaskStatus = TaskStatus;
 
@@ -82,38 +90,6 @@ export class TaskCardComponent {
       case TaskCategory.SHOPPING: return 'warning';
       default: return 'default';
     }
-  }
-
-  getStatusVariant(status: TaskStatus): BadgeVariant {
-    switch (status) {
-      case TaskStatus.TODO: return 'default';
-      case TaskStatus.SCHEDULED: return 'purple';
-      case TaskStatus.IN_PROGRESS: return 'info';
-      case TaskStatus.BLOCKED: return 'error';
-      case TaskStatus.COMPLETED: return 'success';
-      case TaskStatus.ARCHIVED: return 'default';
-      default: return 'default';
-    }
-  }
-
-  getCategoryLabel(category: TaskCategory): string {
-    const labels: Record<TaskCategory, string> = {
-      [TaskCategory.WORK]: 'Work',
-      [TaskCategory.PERSONAL]: 'Personal',
-      [TaskCategory.SHOPPING]: 'Shopping',
-      [TaskCategory.OTHER]: 'Other',
-    };
-    return labels[category] || category;
-  }
-
-  getCategoryClass(category: string) {
-    const classes: Record<string, string> = {
-      [TaskCategory.WORK]: 'bg-indigo-50 text-indigo-700',
-      [TaskCategory.PERSONAL]: 'bg-emerald-50 text-emerald-700',
-      [TaskCategory.SHOPPING]: 'bg-amber-50 text-amber-700',
-      [TaskCategory.OTHER]: 'bg-slate-50 text-slate-700',
-    };
-    return classes[category] || classes[TaskCategory.OTHER];
   }
 
   getPriorityColor(priority: string) {

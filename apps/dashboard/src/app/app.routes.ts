@@ -1,23 +1,40 @@
 import { Routes } from '@angular/router';
-import { LoginPageComponent } from './features/auth/login-page/login-page.component';
-import { SignupPageComponent } from './features/auth/signup-page/signup-page.component';
-import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
-import { TaskListPageComponent } from './features/tasks/task-list-page/task-list-page.component';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { UserRole } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard/tasks', pathMatch: 'full' },
-  { path: 'login', component: LoginPageComponent },
-  { path: 'signup', component: SignupPageComponent },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/login-page/login-page.component').then(
+        (m) => m.LoginPageComponent,
+      ),
+  },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./features/auth/signup-page/signup-page.component').then(
+        (m) => m.SignupPageComponent,
+      ),
+  },
   {
     path: 'dashboard',
-    component: DashboardLayoutComponent,
+    loadComponent: () =>
+      import('./layout/dashboard-layout/dashboard-layout.component').then(
+        (m) => m.DashboardLayoutComponent,
+      ),
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'tasks', pathMatch: 'full' },
-      { path: 'tasks', component: TaskListPageComponent },
+      {
+        path: 'tasks',
+        loadComponent: () =>
+          import(
+            './features/tasks/task-list-page/task-list-page.component'
+          ).then((m) => m.TaskListPageComponent),
+      },
       {
         path: 'audit',
         loadComponent: () =>

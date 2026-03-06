@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Task, TaskStatus } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 import { TaskCardComponent } from './task-card.component';
-import { BadgeComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
+import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
 
 @Component({
   selector: 'app-task-column',
@@ -41,7 +41,8 @@ import { BadgeComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/
             [task]="task"
             [canEdit]="canEdit"
             (edit)="edit.emit($event)"
-            (delete)="delete.emit($event)"
+            (duplicate)="duplicate.emit($event)"
+            (delete)="taskDelete.emit($event)"
             cdkDrag
           />
         }
@@ -66,13 +67,14 @@ export class TaskColumnComponent {
 
   @Output() drop = new EventEmitter<CdkDragDrop<Task[]>>();
   @Output() edit = new EventEmitter<Task>();
-  @Output() delete = new EventEmitter<string>();
+  @Output() duplicate = new EventEmitter<Task>();
+  @Output() taskDelete = new EventEmitter<string>();
 
   onDrop(event: CdkDragDrop<Task[]>) {
     this.drop.emit(event);
   }
 
-  getBadgeVariant(): any {
+  getBadgeVariant(): BadgeVariant {
     switch (this.status) {
       case TaskStatus.TODO: return 'default';
       case TaskStatus.SCHEDULED: return 'purple';

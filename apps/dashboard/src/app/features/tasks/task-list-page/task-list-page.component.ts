@@ -5,15 +5,12 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
-  ViewChild,
-  ElementRef,
   OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { LucideAngularModule } from 'lucide-angular';
-import { TaskService, ThemeService, KeyboardShortcutsService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
+import { TaskService, KeyboardShortcutsService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
 import { AuthStore, UiStateService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state';
 import {
   UserRole,
@@ -38,7 +35,6 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
   imports: [
     CommonModule,
     LucideAngularModule,
-    FormsModule,
     DragDropModule,
     TaskHeaderComponent,
     TaskColumnComponent,
@@ -91,7 +87,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 (drop)="drop($event, TaskStatus.TODO)"
                 (edit)="openEdit($event)"
-                (delete)="deleteTask($event)"
+                (duplicate)="handleDuplicate($event)"
+                (taskDelete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
@@ -105,7 +102,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 countClass="border-purple-100 dark:border-purple-900 text-purple-600 dark:text-purple-300"
                 (drop)="drop($event, TaskStatus.SCHEDULED)"
                 (edit)="openEdit($event)"
-                (delete)="deleteTask($event)"
+                (duplicate)="handleDuplicate($event)"
+                (taskDelete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
@@ -119,7 +117,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 countClass="border-blue-100 dark:border-blue-900 text-blue-600 dark:text-blue-300"
                 (drop)="drop($event, TaskStatus.IN_PROGRESS)"
                 (edit)="openEdit($event)"
-                (delete)="deleteTask($event)"
+                (duplicate)="handleDuplicate($event)"
+                (taskDelete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
@@ -133,7 +132,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 countClass="border-red-100 dark:border-red-900 text-red-600 dark:text-red-300"
                 (drop)="drop($event, TaskStatus.BLOCKED)"
                 (edit)="openEdit($event)"
-                (delete)="deleteTask($event)"
+                (duplicate)="handleDuplicate($event)"
+                (taskDelete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
@@ -147,7 +147,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 countClass="border-green-100 dark:border-green-900 text-green-600 dark:text-green-300"
                 (drop)="drop($event, TaskStatus.COMPLETED)"
                 (edit)="openEdit($event)"
-                (delete)="deleteTask($event)"
+                (duplicate)="handleDuplicate($event)"
+                (taskDelete)="deleteTask($event)"
               ></app-task-column>
 
               <app-task-column
@@ -161,7 +162,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 countClass="border-slate-200 dark:border-slate-900 text-slate-600 dark:text-slate-300"
                 (drop)="drop($event, TaskStatus.ARCHIVED)"
                 (edit)="openEdit($event)"
-                (delete)="deleteTask($event)"
+                (duplicate)="handleDuplicate($event)"
+                (taskDelete)="deleteTask($event)"
               ></app-task-column>
             </div>
           </div>
@@ -220,12 +222,9 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
 })
 export class TaskListPageComponent implements OnInit, OnDestroy {
   public taskService = inject(TaskService);
-  public themeService = inject(ThemeService);
   private authStore = inject(AuthStore);
   public shortcutService = inject(KeyboardShortcutsService);
   public uiState = inject(UiStateService);
-
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   tasks = this.taskService.tasks;
   user = this.authStore.user;
@@ -339,13 +338,6 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
       category: 'Global',
       action: () => this.openCreate(),
     });
-
-    this.shortcutService.registerShortcut({
-      key: 'f',
-      description: 'Focus Search',
-      category: 'Global',
-      action: () => this.searchInput.nativeElement.focus(),
-    });
   }
 
   resetFilters() {
@@ -359,25 +351,6 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
       const task = event.previousContainer.data[event.previousIndex];
       this.taskService.updateTask(task.id, { status: newStatus });
     }
-  }
-
-  getCategoryClass(category: string) {
-    const classes: Record<string, string> = {
-      [TaskCategory.WORK]: 'bg-indigo-50 text-indigo-700',
-      [TaskCategory.PERSONAL]: 'bg-emerald-50 text-emerald-700',
-      [TaskCategory.SHOPPING]: 'bg-amber-50 text-amber-700',
-      [TaskCategory.OTHER]: 'bg-slate-50 text-slate-700',
-    };
-    return classes[category] || classes[TaskCategory.OTHER];
-  }
-
-  getPriorityColor(priority: string) {
-    const classes: Record<string, string> = {
-      [TaskPriority.HIGH]: 'text-red-600',
-      [TaskPriority.MEDIUM]: 'text-orange-500',
-      [TaskPriority.LOW]: 'text-sky-500',
-    };
-    return classes[priority] || classes[TaskPriority.LOW];
   }
 
   openCreate() {
@@ -408,5 +381,14 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
       this.editingTask.set(null);
       this.isModalOpen.set(false);
     }
+  }
+
+  handleDuplicate(task: Task) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _id, createdAt: _c, updatedAt: _u, ...duplicateData } = task;
+    this.taskService.createTask({
+      ...duplicateData,
+      title: `${task.title} (Copy)`,
+    });
   }
 }

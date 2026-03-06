@@ -22,6 +22,8 @@ import {
   Menu,
   Sun,
   Moon,
+  Copy,
+  BarChart3,
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -60,6 +62,8 @@ export const appConfig: ApplicationConfig = {
         Menu,
         Sun,
         Moon,
+        Copy,
+        BarChart3,
       }),
     },
   ],
