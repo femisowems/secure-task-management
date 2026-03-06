@@ -26,7 +26,6 @@ export class TasksService {
     @Inject(RbacService)
     private rbacService: RbacService,
     @Inject(OrgScopeService)
-    @Inject(OrgScopeService)
     private orgScopeService: OrgScopeService,
     private eventEmitter: EventEmitter2,
   ) {}
@@ -76,6 +75,7 @@ export class TasksService {
       return this.tasksRepo.find({
         where: {
           organizationId: user.organizationId,
+          createdBy: user.id,
         },
       });
     }

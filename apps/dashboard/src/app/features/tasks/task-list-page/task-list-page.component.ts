@@ -158,6 +158,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [status]="TaskStatus.TODO"
                 [tasks]="todoTasks()"
                 [canEdit]="canEdit()"
+                [canDuplicate]="canDuplicate()"
+                [canDelete]="canDelete()"
                 (drop)="drop($event, TaskStatus.TODO)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
@@ -169,6 +171,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [status]="TaskStatus.SCHEDULED"
                 [tasks]="scheduledTasks()"
                 [canEdit]="canEdit()"
+                [canDuplicate]="canDuplicate()"
+                [canDelete]="canDelete()"
                 containerClass="bg-purple-50/40 dark:bg-purple-900/10 border-purple-100/50 dark:border-purple-800/30"
                 dotClass="bg-purple-500"
                 titleClass="text-purple-900 dark:text-purple-300"
@@ -184,6 +188,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [status]="TaskStatus.IN_PROGRESS"
                 [tasks]="inProgressTasks()"
                 [canEdit]="canEdit()"
+                [canDuplicate]="canDuplicate()"
+                [canDelete]="canDelete()"
                 containerClass="bg-blue-50/40 dark:bg-blue-900/10 border-blue-100/50 dark:border-blue-800/30"
                 dotClass="bg-blue-500 animate-pulse"
                 titleClass="text-blue-900 dark:text-blue-300"
@@ -199,6 +205,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [status]="TaskStatus.BLOCKED"
                 [tasks]="blockedTasks()"
                 [canEdit]="canEdit()"
+                [canDuplicate]="canDuplicate()"
+                [canDelete]="canDelete()"
                 containerClass="bg-red-50/40 dark:bg-red-900/10 border-red-100/50 dark:border-red-800/30"
                 dotClass="bg-red-500"
                 titleClass="text-red-900 dark:text-red-300"
@@ -214,6 +222,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [status]="TaskStatus.COMPLETED"
                 [tasks]="completedTasks()"
                 [canEdit]="canEdit()"
+                [canDuplicate]="canDuplicate()"
+                [canDelete]="canDelete()"
                 containerClass="bg-green-50/40 dark:bg-green-900/10 border-green-100/50 dark:border-green-800/30"
                 dotClass="bg-green-500"
                 titleClass="text-green-900 dark:text-green-300"
@@ -231,6 +241,8 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                   [status]="TaskStatus.ARCHIVED"
                   [tasks]="archivedTasks()"
                   [canEdit]="canEdit()"
+                  [canDuplicate]="canDuplicate()"
+                  [canDelete]="canDelete()"
                   containerClass="bg-slate-100/40 dark:bg-slate-900/10 border-slate-200/50 dark:border-slate-800/30"
                   dotClass="bg-slate-500"
                   titleClass="text-slate-900 dark:text-slate-300"
@@ -305,7 +317,9 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
 
   tasks = this.taskService.tasks;
   user = this.authStore.user;
-  canEdit = computed(() => this.user()?.role !== UserRole.VIEWER);
+  canEdit = computed(() => !!this.user());
+  canDuplicate = computed(() => !!this.user());
+  canDelete = computed(() => this.user()?.role !== UserRole.VIEWER);
 
   categories = Object.values(TaskCategory);
   statusMap = TaskStatus;

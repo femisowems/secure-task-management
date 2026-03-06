@@ -16,11 +16,11 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
 
     const hasRole = allowedRoles.includes(user.role);
 
-    // Inheritance logic: Owner can do everything Admin/Viewer can
-    if (!hasRole && user.role === UserRole.OWNER) return true;
+    // Inheritance logic: Admin is highest role and can access Owner/Viewer routes.
+    if (!hasRole && user.role === UserRole.ADMIN) return true;
     if (
       !hasRole &&
-      user.role === UserRole.ADMIN &&
+      user.role === UserRole.OWNER &&
       allowedRoles.includes(UserRole.VIEWER)
     )
       return true;

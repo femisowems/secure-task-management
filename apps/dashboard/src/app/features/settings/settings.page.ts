@@ -513,11 +513,11 @@ export class SettingsPage implements OnInit {
 
   // Security: Viewable by Owner, Editable by Owner
   canViewSecurity() {
-    return [UserRole.OWNER].includes(this.userRole());
+    return [UserRole.ADMIN, UserRole.OWNER].includes(this.userRole());
   }
 
   canEditSecurity() {
-    return [UserRole.OWNER].includes(this.userRole());
+    return [UserRole.ADMIN, UserRole.OWNER].includes(this.userRole());
   }
 
   // --- Actions ---

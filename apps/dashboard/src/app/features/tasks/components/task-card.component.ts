@@ -42,27 +42,37 @@ import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953
         <div
           class="flex justify-end gap-2 mt-1 lg:mt-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all lg:transform lg:translate-y-1 lg:group-hover:translate-y-0"
         >
-          @if (canEdit) {
+          @if (canEdit || canDuplicate || canDelete) {
             <div class="flex gap-2">
-              <button
-                (click)="duplicate.emit(task)"
-                class="p-1.5 lg:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-lg transition-all"
-                title="Duplicate Task"
-              >
-                <lucide-icon name="copy" [size]="14"></lucide-icon>
-              </button>
-              <button
-                (click)="edit.emit(task)"
-                class="p-1.5 lg:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-lg transition-all"
-              >
-                <lucide-icon name="pencil" [size]="14"></lucide-icon>
-              </button>
-              <button
-                (click)="delete.emit(task.id)"
-                class="p-1.5 lg:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-all"
-              >
-                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-              </button>
+              @if (canDuplicate) {
+                <button
+                  (click)="duplicate.emit(task)"
+                  class="p-1.5 lg:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-lg transition-all"
+                  title="Duplicate Task"
+                >
+                  <lucide-icon name="copy" [size]="14"></lucide-icon>
+                </button>
+              }
+
+              @if (canEdit) {
+                <button
+                  (click)="edit.emit(task)"
+                  class="p-1.5 lg:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-lg transition-all"
+                  title="Edit Task"
+                >
+                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                </button>
+              }
+
+              @if (canDelete) {
+                <button
+                  (click)="delete.emit(task.id)"
+                  class="p-1.5 lg:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-all"
+                  title="Delete Task"
+                >
+                  <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                </button>
+              }
             </div>
           }
         </div>
@@ -78,6 +88,8 @@ import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953
 export class TaskCardComponent {
   @Input({ required: true }) task!: Task;
   @Input() canEdit = true;
+  @Input() canDuplicate = true;
+  @Input() canDelete = true;
   @Output() edit = new EventEmitter<Task>();
   @Output() duplicate = new EventEmitter<Task>();
   @Output() delete = new EventEmitter<string>();

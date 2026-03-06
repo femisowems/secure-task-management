@@ -16,15 +16,15 @@ export class RbacService {
   hasRequiredRole(userRole: UserRole, requiredRoles: UserRole[]): boolean {
     if (requiredRoles.includes(userRole)) return true;
 
-    if (userRole === UserRole.OWNER) {
+    if (userRole === UserRole.ADMIN) {
       if (
-        requiredRoles.includes(UserRole.ADMIN) ||
+        requiredRoles.includes(UserRole.OWNER) ||
         requiredRoles.includes(UserRole.VIEWER)
       )
         return true;
     }
 
-    if (userRole === UserRole.ADMIN) {
+    if (userRole === UserRole.OWNER) {
       if (requiredRoles.includes(UserRole.VIEWER)) return true;
     }
 

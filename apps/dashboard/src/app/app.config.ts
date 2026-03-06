@@ -24,6 +24,7 @@ import {
   Moon,
   Copy,
   BarChart3,
+  ChevronDown,
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -64,6 +65,7 @@ export const appConfig: ApplicationConfig = {
         Moon,
         Copy,
         BarChart3,
+        ChevronDown,
       }),
     },
   ],
