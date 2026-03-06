@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state';
 import { SupabaseService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
@@ -68,6 +68,14 @@ import { SupabaseService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8
           [formGroup]="loginForm"
           (ngSubmit)="onSubmit()"
         >
+          @if (sessionMessage()) {
+            <div
+              class="bg-amber-50 border border-amber-200 text-amber-800 text-xs py-grid-sm px-grid-md rounded-md text-center"
+            >
+              {{ sessionMessage() }}
+            </div>
+          }
+
           <div class="space-y-grid-md">
             <div class="space-y-grid-xs">
               <label
@@ -155,6 +163,16 @@ export class LoginPageComponent implements OnInit {
   private authStore = inject(AuthStore);
   private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
+  });
+
+  isLoading = signal(false);
+  error = signal('');
+  sessionMessage = signal('');
 
   constructor() {
     effect(() => {
@@ -165,19 +183,28 @@ export class LoginPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Initial check is handled by the effect, but we can keep a secondary check here for safety
+    this.handleSessionExpiredMessage();
+
+    // Initial check is handled by the effect, but keep a secondary check for safety.
     if (this.authStore.isAuthenticated()) {
       this.router.navigate(['/dashboard/tasks']);
     }
   }
 
-  loginForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
-  });
+  private handleSessionExpiredMessage() {
+    const expired = this.route.snapshot.queryParamMap.get('sessionExpired');
+    if (expired === '1') {
+      this.sessionMessage.set('Your session expired. Please sign in again.');
 
-  isLoading = signal(false);
-  error = signal('');
+      // Remove the flag so refreshes do not keep showing this banner.
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { sessionExpired: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+  }
 
   async onSubmit() {
     if (this.loginForm.invalid) return;
@@ -186,18 +213,24 @@ export class LoginPageComponent implements OnInit {
       this.isLoading.set(true);
       this.error.set('');
 
-      const { email, password } = this.loginForm.value;
+      const { email, password } = this.loginForm.getRawValue();
+      if (!email || !password) {
+        this.error.set('Email and password are required');
+        return;
+      }
+
       const { error } = await this.supabase.auth.signInWithPassword({
-        email: email!,
-        password: password!,
+        email,
+        password,
       });
 
       if (error) throw error;
 
-      // AuthStore will automatically pick up the session change
+      // AuthStore will automatically pick up the session change.
       this.router.navigate(['/dashboard/tasks']);
-    } catch (err: any) {
-      this.error.set(err.message || 'Failed to login');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to login';
+      this.error.set(message);
     } finally {
       this.isLoading.set(false);
     }

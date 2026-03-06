@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { SupabaseService, APP_CONFIG } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
 import { User } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
@@ -17,6 +17,8 @@ export class AuthStore {
   private _user = signal<User | null>(null);
   private _loading = signal<boolean>(true);
   private _token = signal<string | null>(null);
+  private _isFetchingProfile = false;
+  private _lastUnauthorizedToken: string | null = null;
 
   user = this._user.asReadonly();
   isLoading = this._loading.asReadonly();
@@ -31,7 +33,11 @@ export class AuthStore {
     const {
       data: { session },
     } = await this.supabase.auth.getSession();
-    this._token.set(session?.access_token || null);
+    const initialToken = session?.access_token || null;
+    this._token.set(initialToken);
+    if (this._lastUnauthorizedToken && this._lastUnauthorizedToken !== initialToken) {
+      this._lastUnauthorizedToken = null;
+    }
 
     if (session) {
       await this.fetchProfile();
@@ -40,7 +46,11 @@ export class AuthStore {
     }
 
     this.supabase.auth.onAuthStateChange(async (event: any, session: any) => {
-      this._token.set(session?.access_token || null);
+      const nextToken = session?.access_token || null;
+      this._token.set(nextToken);
+      if (this._lastUnauthorizedToken && this._lastUnauthorizedToken !== nextToken) {
+        this._lastUnauthorizedToken = null;
+      }
       if (session) {
         await this.fetchProfile();
       } else {
@@ -51,16 +61,48 @@ export class AuthStore {
   }
 
   async fetchProfile() {
+    const token = this._token();
+    if (!token) {
+      this._user.set(null);
+      this._loading.set(false);
+      return;
+    }
+
+    // Avoid duplicate in-flight profile requests.
+    if (this._isFetchingProfile) {
+      return;
+    }
+
+    // Avoid spamming the same unauthorized token repeatedly.
+    if (this._lastUnauthorizedToken === token) {
+      this._user.set(null);
+      this._loading.set(false);
+      return;
+    }
+
     try {
+      this._isFetchingProfile = true;
       this._loading.set(true);
       const profile = await firstValueFrom(
         this.http.get<User>(`${this.config.apiUrl}/auth/me`),
       );
       this._user.set(profile);
+      this._lastUnauthorizedToken = null;
     } catch (error) {
       console.error('Failed to fetch profile:', error);
       this._user.set(null);
+
+      const httpError = error as HttpErrorResponse;
+      if (httpError?.status === 401) {
+        this._lastUnauthorizedToken = token;
+        await this.supabase.auth.signOut();
+        this._token.set(null);
+        this.router.navigate(['/login'], {
+          queryParams: { sessionExpired: '1' },
+        });
+      }
     } finally {
+      this._isFetchingProfile = false;
       this._loading.set(false);
     }
   }

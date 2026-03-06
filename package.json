@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "npm run dev",
+    "start": "node dist/apps/api/main.js",
     "dev": "npx nx run-many -t serve --parallel",
     "d": "npm run dev",
     "start:api": "npx nx serve api",
