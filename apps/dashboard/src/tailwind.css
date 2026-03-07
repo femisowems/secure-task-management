@@ -386,9 +386,6 @@
   .isolate {
     isolation: isolate;
   }
-  .z-10 {
-    z-index: 10;
-  }
   .z-30 {
     z-index: 30;
   }
@@ -819,6 +816,9 @@
   }
   .overflow-hidden {
     overflow: hidden;
+  }
+  .overflow-visible {
+    overflow: visible;
   }
   .overflow-x-auto {
     overflow-x: auto;

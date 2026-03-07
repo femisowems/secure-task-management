@@ -51,7 +51,7 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
           No users found in your organization.
         </div>
       } @else {
-        <div class="bg-surface-glass backdrop-blur-md shadow-sm border border-border-subtle rounded-card overflow-hidden">
+        <div class="bg-surface-glass backdrop-blur-md shadow-sm border border-border-subtle rounded-card">
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-border-subtle">
               <thead class="bg-gray-50/50 dark:bg-slate-900/30">
@@ -131,7 +131,7 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
                     <td class="px-grid-lg py-grid-md text-body-sm text-text-secondary">
                       {{ user.createdAt | date: 'short' }}
                     </td>
-                    <td class="px-grid-lg py-grid-md text-right">
+                    <td class="px-grid-lg py-grid-md text-right overflow-visible">
                       <div class="relative inline-block" data-user-menu>
                         <button
                           type="button"
@@ -143,7 +143,7 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
                         </button>
 
                         @if (openMenuUserId() === user.id) {
-                          <div class="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-border-subtle z-10">
+                          <div class="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-border-subtle z-[100]">
                             <!-- Edit User Option -->
                             <button
                               type="button"
