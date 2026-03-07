@@ -45,7 +45,7 @@ import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/mo
             [ngModel]="searchQuery"
             (ngModelChange)="searchQueryChange.emit($event)"
             placeholder="Search tasks..."
-            class="w-full pl-10 pr-4 h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+            class="w-full pl-10 pr-4 h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/50 outline-none transition-all text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
           />
         </div>
 
@@ -60,7 +60,7 @@ import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/mo
             <select
               [ngModel]="categoryFilter"
               (ngModelChange)="categoryFilterChange.emit($event)"
-              class="w-full sm:w-auto appearance-none pl-9 pr-10 h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-900 dark:text-slate-100"
+              class="w-full sm:w-auto appearance-none pl-9 pr-10 h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/50 outline-none transition-all text-sm text-slate-900 dark:text-slate-100"
             >
               <option value="all">All Categories</option>
               @for (cat of categories; track cat) {
@@ -82,7 +82,7 @@ import { TaskCategory } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/mo
             <app-button
               (btnClick)="create.emit()"
               variant="primary"
-              customClass="w-full lg:w-auto shadow-indigo-100 dark:shadow-none"
+              customClass="w-full lg:w-auto bg-brand-gradient hover:opacity-90 shadow-brand-primary/20"
             >
               <lucide-icon name="plus" [size]="18" class="mr-2"></lucide-icon>
               <span>Create New Task</span>

@@ -21,13 +21,13 @@ import { LucideAngularModule } from 'lucide-angular';
       >
         <div class="flex items-center gap-4">
           <div class="relative group">
-            <div class="absolute -inset-1 bg-gradient-to-r from-magenta-500 to-orange-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <div class="absolute -inset-1 bg-brand-gradient rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
             <img src="logo.png" alt="Secure Task Management" class="relative w-14 h-14 rounded-xl shadow-xl border border-white/10 bg-white object-contain p-1">
           </div>
           <div>
             <h1 class="text-h4 font-extrabold text-text-primary leading-none tracking-tight">
               Secure Task
-              <span class="block text-[10px] font-bold text-indigo-500 tracking-[0.2em] uppercase mt-1 opacity-70">Management</span>
+              <span class="block text-[10px] font-bold text-brand-primary tracking-[0.2em] uppercase mt-1 opacity-80">Management</span>
             </h1>
             <p
               class="text-[10px] text-text-secondary uppercase tracking-widest font-bold opacity-60 mt-1"
@@ -49,9 +49,9 @@ import { LucideAngularModule } from 'lucide-angular';
         <a
           routerLink="/dashboard/tasks"
           (click)="closeSidebar()"
-          routerLinkActive="bg-indigo-50 text-indigo-700 font-bold"
+          routerLinkActive="bg-brand-primary/10 text-brand-primary font-bold border-r-2 border-brand-primary"
           [routerLinkActiveOptions]="{ exact: false }"
-          class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-colors text-text-secondary hover:bg-gray-50 hover:text-text-primary text-body-sm font-medium"
+          class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-all text-text-secondary hover:bg-surface-glass hover:text-text-primary text-body-sm font-medium"
         >
           <lucide-icon name="layout-dashboard" [size]="18"></lucide-icon>
           Tasks
@@ -61,8 +61,8 @@ import { LucideAngularModule } from 'lucide-angular';
           <a
             routerLink="/dashboard/users"
             (click)="closeSidebar()"
-            routerLinkActive="bg-indigo-50 text-indigo-700 font-bold"
-            class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-colors text-text-secondary hover:bg-gray-50 hover:text-text-primary text-body-sm font-medium"
+            routerLinkActive="bg-brand-primary/10 text-brand-primary font-bold border-r-2 border-brand-primary"
+            class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-all text-text-secondary hover:bg-surface-glass hover:text-text-primary text-body-sm font-medium"
           >
             <lucide-icon name="users" [size]="18"></lucide-icon>
             User Management
@@ -73,8 +73,8 @@ import { LucideAngularModule } from 'lucide-angular';
           <a
             routerLink="/dashboard/audit"
             (click)="closeSidebar()"
-            routerLinkActive="bg-indigo-50 text-indigo-700 font-bold"
-            class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-colors text-text-secondary hover:bg-gray-50 hover:text-text-primary text-body-sm font-medium"
+            routerLinkActive="bg-brand-primary/10 text-brand-primary font-bold border-r-2 border-brand-primary"
+            class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-all text-text-secondary hover:bg-surface-glass hover:text-text-primary text-body-sm font-medium"
           >
             <lucide-icon name="shield-alert" [size]="18"></lucide-icon>
             Audit Log
@@ -84,8 +84,8 @@ import { LucideAngularModule } from 'lucide-angular';
         <a
           routerLink="/dashboard/settings"
           (click)="closeSidebar()"
-          routerLinkActive="bg-indigo-50 text-indigo-700 font-bold"
-          class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-colors text-text-secondary hover:bg-gray-50 hover:text-text-primary text-body-sm font-medium"
+          routerLinkActive="bg-brand-primary/10 text-brand-primary font-bold border-r-2 border-brand-primary"
+          class="flex items-center gap-grid-sm px-grid-md py-grid-sm rounded-md transition-all text-text-secondary hover:bg-surface-glass hover:text-text-primary text-body-sm font-medium"
         >
           <lucide-icon name="settings" [size]="18"></lucide-icon>
           Settings
@@ -95,7 +95,7 @@ import { LucideAngularModule } from 'lucide-angular';
       <div class="p-grid-md border-t border-border-subtle space-y-1">
         <button
           (click)="themeService.toggleTheme()"
-          class="w-full flex items-center gap-grid-sm px-grid-md py-grid-sm text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-md transition-colors text-body-sm font-medium"
+          class="w-full flex items-center gap-grid-sm px-grid-md py-grid-sm text-text-secondary hover:bg-surface-glass hover:text-text-primary rounded-md transition-all text-body-sm font-medium"
         >
           <lucide-icon
             [name]="themeService.theme() === 'dark' ? 'sun' : 'moon'"

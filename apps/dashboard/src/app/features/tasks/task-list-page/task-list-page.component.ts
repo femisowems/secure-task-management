@@ -8,6 +8,7 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -450,6 +451,13 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
 
   toggleColumnGuideModal() {
     this.shortcutService.toggleHelpModal('column-guide');
+  }
+
+  @HostListener('window:keydown.escape')
+  handleEscape() {
+    if (this.shortcutService.isHelpModalOpen('column-guide')) {
+      this.toggleColumnGuideModal();
+    }
   }
 
   closeColumnGuideOnBackdrop(event: MouseEvent) {
