@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { SupabaseService, APP_CONFIG } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
 import { User } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 import { firstValueFrom } from 'rxjs';
+import { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +46,8 @@ export class AuthStore {
       this._loading.set(false);
     }
 
-    this.supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+    this.supabase.auth.onAuthStateChange(
+      async (_event: AuthChangeEvent, session: Session | null) => {
       const nextToken = session?.access_token || null;
       this._token.set(nextToken);
       if (this._lastUnauthorizedToken && this._lastUnauthorizedToken !== nextToken) {
@@ -57,7 +59,8 @@ export class AuthStore {
         this._user.set(null);
       }
       this._loading.set(false);
-    });
+      },
+    );
   }
 
   async fetchProfile() {

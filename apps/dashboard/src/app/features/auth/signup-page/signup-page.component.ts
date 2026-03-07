@@ -177,13 +177,17 @@ export class SignupPageComponent implements OnInit {
       this.error.set('');
 
       const { email, password, role } = this.signupForm.value;
+      if (!email || !password || !role) {
+        this.error.set('Email, password, and role are required');
+        return;
+      }
 
       // Auto-generate a new Organization ID for the user
       const organizationId = crypto.randomUUID();
 
       const { data, error } = await this.supabase.auth.signUp({
-        email: email!,
-        password: password!,
+        email,
+        password,
         options: {
           data: {
             organization_id: organizationId,
@@ -205,8 +209,8 @@ export class SignupPageComponent implements OnInit {
       }
 
       this.success.set(true);
-    } catch (err: any) {
-      this.error.set(err.message || 'Failed to sign up');
+    } catch (err: unknown) {
+      this.error.set(err instanceof Error ? err.message : 'Failed to sign up');
     } finally {
       this.isLoading.set(false);
     }

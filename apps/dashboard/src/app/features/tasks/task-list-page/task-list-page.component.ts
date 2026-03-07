@@ -78,13 +78,15 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
         @if (shortcutService.isHelpModalOpen('column-guide')) {
           <div
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]"
-            (click)="toggleColumnGuideModal()"
+            (click)="closeColumnGuideOnBackdrop($event)"
             (keydown.escape)="toggleColumnGuideModal()"
+            (keyup.enter)="toggleColumnGuideModal()"
+            (keyup.space)="toggleColumnGuideModal()"
+            role="button"
             tabindex="0"
           >
             <div
               class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl p-6 lg:p-8 relative shadow-2xl border border-slate-200 dark:border-slate-700 animate-in zoom-in duration-200"
-              (click)="$event.stopPropagation()"
             >
               <button
                 (click)="toggleColumnGuideModal()"
@@ -160,7 +162,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 [canDuplicate]="canDuplicate()"
                 [canDelete]="canDelete()"
-                (drop)="drop($event, TaskStatus.TODO)"
+                (taskDrop)="drop($event, TaskStatus.TODO)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
                 (taskDelete)="deleteTask($event)"
@@ -177,7 +179,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 dotClass="bg-purple-500"
                 titleClass="text-purple-900 dark:text-purple-300"
                 countClass="border-purple-100 dark:border-purple-900 text-purple-600 dark:text-purple-300"
-                (drop)="drop($event, TaskStatus.SCHEDULED)"
+                (taskDrop)="drop($event, TaskStatus.SCHEDULED)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
                 (taskDelete)="deleteTask($event)"
@@ -194,7 +196,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 dotClass="bg-blue-500 animate-pulse"
                 titleClass="text-blue-900 dark:text-blue-300"
                 countClass="border-blue-100 dark:border-blue-900 text-blue-600 dark:text-blue-300"
-                (drop)="drop($event, TaskStatus.IN_PROGRESS)"
+                (taskDrop)="drop($event, TaskStatus.IN_PROGRESS)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
                 (taskDelete)="deleteTask($event)"
@@ -211,7 +213,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 dotClass="bg-red-500"
                 titleClass="text-red-900 dark:text-red-300"
                 countClass="border-red-100 dark:border-red-900 text-red-600 dark:text-red-300"
-                (drop)="drop($event, TaskStatus.BLOCKED)"
+                (taskDrop)="drop($event, TaskStatus.BLOCKED)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
                 (taskDelete)="deleteTask($event)"
@@ -228,7 +230,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 dotClass="bg-green-500"
                 titleClass="text-green-900 dark:text-green-300"
                 countClass="border-green-100 dark:border-green-900 text-green-600 dark:text-green-300"
-                (drop)="drop($event, TaskStatus.COMPLETED)"
+                (taskDrop)="drop($event, TaskStatus.COMPLETED)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
                 (taskDelete)="deleteTask($event)"
@@ -247,7 +249,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                   dotClass="bg-slate-500"
                   titleClass="text-slate-900 dark:text-slate-300"
                   countClass="border-slate-200 dark:border-slate-900 text-slate-600 dark:text-slate-300"
-                  (drop)="drop($event, TaskStatus.ARCHIVED)"
+                  (taskDrop)="drop($event, TaskStatus.ARCHIVED)"
                   (edit)="openEdit($event)"
                   (duplicate)="handleDuplicate($event)"
                   (taskDelete)="deleteTask($event)"
@@ -448,6 +450,12 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
 
   toggleColumnGuideModal() {
     this.shortcutService.toggleHelpModal('column-guide');
+  }
+
+  closeColumnGuideOnBackdrop(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.toggleColumnGuideModal();
+    }
   }
 
   toggleArchived() {

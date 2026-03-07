@@ -195,20 +195,23 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
     @if (showAddUserModal()) {
       <div
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        (click)="closeAddUserModal()"
+        (click)="onModalBackdropClick($event, 'add')"
+        (keydown.escape)="closeAddUserModal()"
+        (keyup.enter)="closeAddUserModal()"
+        (keyup.space)="closeAddUserModal()"
+        role="button"
+        tabindex="0"
       >
-        <div
-          class="bg-white dark:bg-slate-800 rounded-card shadow-xl max-w-md w-full p-6"
-          (click)="$event.stopPropagation()"
-        >
+        <div class="bg-white dark:bg-slate-800 rounded-card shadow-xl max-w-md w-full p-6">
           <h2 class="text-xl font-bold text-text-primary mb-4">Add New User</h2>
           <form [formGroup]="addUserForm" (ngSubmit)="submitAddUser()">
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-text-primary mb-1">
+                <label for="add-user-email" class="block text-sm font-medium text-text-primary mb-1">
                   Email <span class="text-red-500">*</span>
                 </label>
                 <input
+                  id="add-user-email"
                   type="email"
                   formControlName="email"
                   class="w-full px-3 h-10 rounded-xl border border-border-subtle bg-white dark:bg-slate-800 text-sm text-text-primary"
@@ -217,8 +220,9 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-text-primary mb-1">Name</label>
+                <label for="add-user-name" class="block text-sm font-medium text-text-primary mb-1">Name</label>
                 <input
+                  id="add-user-name"
                   type="text"
                   formControlName="name"
                   class="w-full px-3 h-10 rounded-xl border border-border-subtle bg-white dark:bg-slate-800 text-sm text-text-primary"
@@ -227,10 +231,11 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-text-primary mb-1">
+                <label for="add-user-role" class="block text-sm font-medium text-text-primary mb-1">
                   Role <span class="text-red-500">*</span>
                 </label>
                 <select
+                  id="add-user-role"
                   formControlName="role"
                   class="w-full px-3 h-10 rounded-xl border border-border-subtle bg-white dark:bg-slate-800 text-sm text-text-primary"
                 >
@@ -272,12 +277,14 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
     @if (showDeleteModal()) {
       <div
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        (click)="closeDeleteModal()"
+        (click)="onModalBackdropClick($event, 'delete')"
+        (keydown.escape)="closeDeleteModal()"
+        (keyup.enter)="closeDeleteModal()"
+        (keyup.space)="closeDeleteModal()"
+        role="button"
+        tabindex="0"
       >
-        <div
-          class="bg-white dark:bg-slate-800 rounded-card shadow-xl max-w-md w-full p-6"
-          (click)="$event.stopPropagation()"
-        >
+        <div class="bg-white dark:bg-slate-800 rounded-card shadow-xl max-w-md w-full p-6">
           <h2 class="text-xl font-bold text-text-primary mb-2">Delete User</h2>
           <p class="text-sm text-text-secondary mb-4">
             Are you sure you want to delete <strong>{{ userToDelete()?.email }}</strong>?
@@ -315,19 +322,22 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
     @if (showEditModal()) {
       <div
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        (click)="closeEditModal()"
+        (click)="onModalBackdropClick($event, 'edit')"
+        (keydown.escape)="closeEditModal()"
+        (keyup.enter)="closeEditModal()"
+        (keyup.space)="closeEditModal()"
+        role="button"
+        tabindex="0"
       >
-        <div
-          class="bg-white dark:bg-slate-800 rounded-card shadow-xl max-w-md w-full p-6"
-          (click)="$event.stopPropagation()"
-        >
+        <div class="bg-white dark:bg-slate-800 rounded-card shadow-xl max-w-md w-full p-6">
           <h2 class="text-xl font-bold text-text-primary mb-4">Edit User</h2>
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-text-primary mb-1">
+              <label for="edit-user-name" class="block text-sm font-medium text-text-primary mb-1">
                 Name
               </label>
               <input
+                id="edit-user-name"
                 type="text"
                 [(ngModel)]="editingName"
                 class="w-full px-3 h-10 rounded-xl border border-border-subtle bg-white dark:bg-slate-800 text-sm text-text-primary"
@@ -336,10 +346,11 @@ import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-text-primary mb-1">
+              <label for="edit-user-role" class="block text-sm font-medium text-text-primary mb-1">
                 Role
               </label>
               <select
+                id="edit-user-role"
                 [(ngModel)]="editingRole"
                 class="w-full px-3 h-10 rounded-xl border border-border-subtle bg-white dark:bg-slate-800 text-sm text-text-primary"
               >
@@ -432,11 +443,17 @@ export class UserManagementPageComponent implements OnInit {
     this.addUserError.set(null);
 
     const formValue = this.addUserForm.value;
+    if (!formValue.email || !formValue.role) {
+      this.addUserError.set('Email and role are required');
+      this.isAddingUser.set(false);
+      return;
+    }
+
     this.userMgmtService
       .createUser({
-        email: formValue.email!,
+        email: formValue.email,
         name: formValue.name || undefined,
-        role: formValue.role!,
+        role: formValue.role,
       })
       .subscribe({
         next: () => {
@@ -563,6 +580,24 @@ export class UserManagementPageComponent implements OnInit {
         this.isVerifyingUserId.set(null);
       },
     });
+  }
+
+  onModalBackdropClick(event: MouseEvent, modal: 'add' | 'delete' | 'edit') {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    switch (modal) {
+      case 'add':
+        this.closeAddUserModal();
+        break;
+      case 'delete':
+        this.closeDeleteModal();
+        break;
+      case 'edit':
+        this.closeEditModal();
+        break;
+    }
   }
 
   getRoleBadgeClass(role: UserRole): string {

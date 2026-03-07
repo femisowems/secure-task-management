@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { catchError, delay, map, switchMap, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { AuthStore } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/state';
-import { AuditService, APP_CONFIG } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
+import { AuditService } from './audit.service';
+import { APP_CONFIG } from './tokens';
 import {
+  User,
   UserSettings,
   SettingsProfile,
   SettingsOrganization,
@@ -16,7 +17,6 @@ import {
   providedIn: 'root',
 })
 export class SettingsService {
-  private authStore = inject(AuthStore);
   private auditService = inject(AuditService);
   private http = inject(HttpClient);
   private config = inject(APP_CONFIG);
@@ -31,18 +31,14 @@ export class SettingsService {
     itemsPerPage: 20,
   };
 
-  getSettings(): Observable<UserSettings> {
-    const user = this.authStore.user();
-    if (!user) {
-      return of({
-        profile: { email: '', role: '', name: '' },
-        organization: { id: '' },
-        security: this.security,
-        preferences: this.preferences,
-      });
-    }
+  private getCurrentUser(): Observable<User | null> {
+    return this.http
+      .get<User>(`${this.config.apiUrl}/auth/me`)
+      .pipe(catchError(() => of(null)));
+  }
 
-    const settings: UserSettings = {
+  private toSettings(user: User): UserSettings {
+    return {
       profile: {
         email: user.email,
         role: user.role,
@@ -61,28 +57,45 @@ export class SettingsService {
         itemsPerPage: 20,
       },
     };
+  }
 
-    return of(settings).pipe(delay(500));
+  private defaultSettings(): UserSettings {
+    return {
+      profile: { email: '', role: '', name: '' },
+      organization: { id: '' },
+      security: this.security,
+      preferences: this.preferences,
+    };
+  }
+
+  getSettings(): Observable<UserSettings> {
+    return this.getCurrentUser().pipe(
+      map((user) => (user ? this.toSettings(user) : this.defaultSettings())),
+      delay(500),
+    );
   }
 
   updateProfile(profile: SettingsProfile): Observable<SettingsProfile> {
-    const user = this.authStore.user();
-    if (!user) return of(profile);
-    return this.http
-      .put<SettingsProfile>(`${this.config.apiUrl}/users/${user.id}`, {
-        name: profile.name,
-      })
-      .pipe(
-        tap((updated) => {
-          this.authStore.updateUser({ name: updated.name });
-          this.auditService.logAction(
-            'Update Profile',
-            { name: updated.name },
-            'User',
-            user.id,
+    return this.getCurrentUser().pipe(
+      switchMap((user) => {
+        if (!user) return of(profile);
+
+        return this.http
+          .put<SettingsProfile>(`${this.config.apiUrl}/users/${user.id}`, {
+            name: profile.name,
+          })
+          .pipe(
+            tap((updated) => {
+              this.auditService.logAction(
+                'Update Profile',
+                { name: updated.name },
+                'User',
+                user.id,
+              );
+            }),
           );
-        }),
-      );
+      }),
+    );
   }
 
   updateOrganization(
@@ -93,46 +106,54 @@ export class SettingsService {
 
   updateSecurity(security: SettingsSecurity): Observable<SettingsSecurity> {
     this.security = security;
-    const user = this.authStore.user();
-    if (!user) return of(security);
 
-    return this.http
-      .put<SettingsSecurity>(`${this.config.apiUrl}/users/${user.id}`, {
-        mfaEnabled: security.mfaEnabled,
-        sessionTimeout: security.sessionTimeout,
-      })
-      .pipe(
-        tap(() => {
-          this.auditService.logAction(
-            'Update Security',
-            { mfa: security.mfaEnabled, timeout: security.sessionTimeout },
-            'User',
-            user.id,
+    return this.getCurrentUser().pipe(
+      switchMap((user) => {
+        if (!user) return of(security);
+
+        return this.http
+          .put<SettingsSecurity>(`${this.config.apiUrl}/users/${user.id}`, {
+            mfaEnabled: security.mfaEnabled,
+            sessionTimeout: security.sessionTimeout,
+          })
+          .pipe(
+            tap(() => {
+              this.auditService.logAction(
+                'Update Security',
+                { mfa: security.mfaEnabled, timeout: security.sessionTimeout },
+                'User',
+                user.id,
+              );
+            }),
           );
-        }),
-      );
+      }),
+    );
   }
 
   updatePreferences(
     preferences: SettingsPreferences,
   ): Observable<SettingsPreferences> {
     this.preferences = preferences;
-    const user = this.authStore.user();
-    if (!user) return of(preferences);
 
-    return this.http
-      .put<SettingsPreferences>(`${this.config.apiUrl}/users/${user.id}`, {
-        preferences,
-      })
-      .pipe(
-        tap(() => {
-          this.auditService.logAction(
-            'Update Preferences',
+    return this.getCurrentUser().pipe(
+      switchMap((user) => {
+        if (!user) return of(preferences);
+
+        return this.http
+          .put<SettingsPreferences>(`${this.config.apiUrl}/users/${user.id}`, {
             preferences,
-            'User',
-            user.id,
+          })
+          .pipe(
+            tap(() => {
+              this.auditService.logAction(
+                'Update Preferences',
+                preferences,
+                'User',
+                user.id,
+              );
+            }),
           );
-        }),
-      );
+      }),
+    );
   }
 }

@@ -69,13 +69,13 @@ export class TaskColumnComponent {
   @Input() titleClass = 'text-slate-700 dark:text-slate-300';
   @Input() countClass = 'border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300';
 
-  @Output() drop = new EventEmitter<CdkDragDrop<Task[]>>();
+  @Output() taskDrop = new EventEmitter<CdkDragDrop<Task[]>>();
   @Output() edit = new EventEmitter<Task>();
   @Output() duplicate = new EventEmitter<Task>();
   @Output() taskDelete = new EventEmitter<string>();
 
   onDrop(event: CdkDragDrop<Task[]>) {
-    this.drop.emit(event);
+    this.taskDrop.emit(event);
   }
 
   getBadgeVariant(): BadgeVariant {

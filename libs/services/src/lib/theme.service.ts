@@ -1,12 +1,21 @@
 import { Injectable, signal, effect, inject } from '@angular/core';
 import { SettingsService } from './settings.service';
-import { Theme } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
+import {
+  Theme,
+  SettingsPreferences,
+} from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
   private settingsService = inject(SettingsService);
+
+  private preferences = signal<SettingsPreferences>({
+    theme: 'system',
+    defaultView: 'kanban',
+    itemsPerPage: 20,
+  });
 
   theme = signal<Theme>(this.getInitialTheme());
 
@@ -27,6 +36,7 @@ export class ThemeService {
 
     this.settingsService.getSettings().subscribe((settings) => {
       if (settings?.preferences?.theme) {
+        this.preferences.set(settings.preferences);
         this.theme.set(settings.preferences.theme as Theme);
       }
     });
@@ -54,7 +64,12 @@ export class ThemeService {
 
   setTheme(theme: Theme) {
     this.theme.set(theme);
-    this.settingsService.updatePreferences({ theme } as any).subscribe();
+    const nextPreferences = {
+      ...this.preferences(),
+      theme,
+    };
+    this.preferences.set(nextPreferences);
+    this.settingsService.updatePreferences(nextPreferences).subscribe();
   }
 
   toggleTheme() {

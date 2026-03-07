@@ -1,4 +1,4 @@
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
 import { LucideAngularModule } from 'lucide-angular';
