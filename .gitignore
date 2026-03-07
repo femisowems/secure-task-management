@@ -53,3 +53,4 @@ database.sqlite
 .env.local
 .env.*.local
 apps/api/.env
+database.sqlite
