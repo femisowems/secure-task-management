@@ -42,6 +42,7 @@ import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953
             [canEdit]="canEdit"
             [canDuplicate]="canDuplicate"
             [canDelete]="canDelete"
+            [teamMap]="teamMap"
             (edit)="edit.emit($event)"
             (duplicate)="duplicate.emit($event)"
             (delete)="taskDelete.emit($event)"
@@ -64,6 +65,7 @@ export class TaskColumnComponent {
   @Input() canEdit = true;
   @Input() canDuplicate = true;
   @Input() canDelete = true;
+  @Input() teamMap: Record<string, string> = {};
   @Input() containerClass = 'bg-slate-50/50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700/50';
   @Input() dotClass = 'bg-slate-400';
   @Input() titleClass = 'text-slate-700 dark:text-slate-300';

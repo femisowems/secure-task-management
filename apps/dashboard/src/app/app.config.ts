@@ -32,6 +32,8 @@ import {
   User,
   Loader,
   Loader2,
+  Building2,
+  ClipboardCheck,
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -80,6 +82,8 @@ export const appConfig: ApplicationConfig = {
         User,
         Loader,
         Loader2,
+        Building2,
+        ClipboardCheck,
       }),
     },
   ],

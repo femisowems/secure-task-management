@@ -22,11 +22,14 @@ import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953
           </app-badge>
           <div class="flex items-center gap-2">
             @if (task.assignedTeamId) {
-              <div class="text-indigo-600 bg-indigo-50 p-1 rounded-md" title="Assigned to Team">
-                <lucide-icon name="users" [size]="14"></lucide-icon>
+              <div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800" [title]="'Assigned to ' + (teamMap[task.assignedTeamId] || 'Team')">
+                <lucide-icon name="users" [size]="14" class="text-indigo-600 dark:text-indigo-400"></lucide-icon>
+                <span class="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 truncate max-w-[80px]">
+                  {{ teamMap[task.assignedTeamId] || 'Team' }}
+                </span>
               </div>
             } @else {
-              <div class="text-slate-400 bg-slate-50 p-1 rounded-md border border-slate-100" title="Unassigned">
+              <div class="text-slate-400 bg-slate-50 dark:bg-slate-900 p-1 rounded-md border border-slate-100 dark:border-slate-800" title="Personal Task">
                 <lucide-icon name="user" [size]="14"></lucide-icon>
               </div>
             }
@@ -102,6 +105,7 @@ export class TaskCardComponent {
   @Input() canEdit = true;
   @Input() canDuplicate = true;
   @Input() canDelete = true;
+  @Input() teamMap: Record<string, string> = {};
   @Output() edit = new EventEmitter<Task>();
   @Output() duplicate = new EventEmitter<Task>();
   @Output() delete = new EventEmitter<string>();

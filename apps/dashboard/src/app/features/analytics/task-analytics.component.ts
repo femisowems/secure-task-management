@@ -1,6 +1,6 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TaskService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
+import { Task, TaskStatus } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 import { LucideAngularModule } from 'lucide-angular';
 import { CardComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
 
@@ -10,7 +10,7 @@ import { CardComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/s
   imports: [CommonModule, LucideAngularModule, CardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-card title="Task Analytics" subtitle="Overview of your project progress">
+    <app-card title="Task Analytics" [subtitle]="'Analysis for: ' + activeFilterTitle">
       <div
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6"
       >
@@ -120,11 +120,31 @@ import { CardComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/s
   ],
 })
 export class TaskAnalyticsComponent {
-  private taskService: TaskService = inject(TaskService);
-  stats = this.taskService.taskStats;
+  private _tasks = signal<Task[]>([]);
+
+  @Input() set tasks(value: Task[]) {
+    this._tasks.set(value || []);
+  }
+
+  @Input() activeFilterTitle = 'All Projects';
+
+  stats = computed(() => {
+    const tasks = this._tasks();
+    return {
+      todo: tasks.filter(t => t.status === TaskStatus.TODO).length,
+      scheduled: tasks.filter(t => t.status === TaskStatus.SCHEDULED).length,
+      inProgress: tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length,
+      blocked: tasks.filter(t => t.status === TaskStatus.BLOCKED).length,
+      completed: tasks.filter(t => t.status === TaskStatus.COMPLETED).length,
+      archived: tasks.filter(t => t.status === TaskStatus.ARCHIVED).length,
+      total: tasks.length,
+    };
+  });
 
   getPercentage(value: number): number {
-    if (this.stats().total === 0) return 0;
-    return (value / this.stats().total) * 100;
+    const total = this.stats().total;
+    if (total === 0) return 0;
+    return (value / total) * 100;
   }
 }
+

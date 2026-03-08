@@ -151,18 +151,40 @@ import { TeamsTabComponent } from './teams-tab.component';
               @if (activeTab() === 'organization') {
                 @if (canViewOrg()) {
                   <div class="space-y-6">
-                    <div>
-                      <span class="block text-sm font-medium text-gray-700"
-                        >Organization ID</span
-                      >
-                      <div
-                        class="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm sm:text-sm h-10 px-3 border flex items-center text-gray-900 font-mono"
-                      >
-                        {{ organization()?.id }}
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+                      <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                          <lucide-icon name="building-2" [size]="20"></lucide-icon>
+                        </div>
+                        <div>
+                          <h3 class="text-sm font-bold text-slate-900">Workspace Identity</h3>
+                          <p class="text-xs text-slate-500">Your unique organization identifier</p>
+                        </div>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Unique identifier for your organization workspace.
-                      </p>
+
+                      <div class="flex items-center gap-2 group">
+                        <div
+                          class="flex-1 bg-white border border-slate-200 rounded-xl px-4 h-12 flex items-center font-mono text-sm text-slate-600 shadow-sm overflow-hidden select-all"
+                        >
+                          {{ organization()?.id }}
+                        </div>
+                        <button
+                          type="button"
+                          (click)="copyOrgId()"
+                          [class.text-green-600]="isOrgIdCopied()"
+                          [class.bg-green-50]="isOrgIdCopied()"
+                          [class.border-green-200]="isOrgIdCopied()"
+                          class="h-12 px-4 bg-white border border-slate-200 rounded-xl hover:border-brand-primary hover:text-brand-primary transition-all flex items-center gap-2 shadow-sm font-semibold text-sm active:scale-95"
+                        >
+                          <lucide-icon [name]="isOrgIdCopied() ? 'clipboard-check' : 'copy'" [size]="18"></lucide-icon>
+                          {{ isOrgIdCopied() ? 'Copied!' : 'Copy ID' }}
+                        </button>
+                      </div>
+                      
+                      <div class="mt-4 flex items-start gap-2 text-xs text-slate-500 bg-slate-100/50 p-3 rounded-lg border border-slate-100">
+                        <lucide-icon name="shield-check" [size]="14" class="mt-0.5 text-slate-400"></lucide-icon>
+                        <p>This ID is used for workspace-wide task management and team coordination. Keep it secure as it identifies your environment.</p>
+                      </div>
                     </div>
                   </div>
                 } @else {
@@ -443,6 +465,7 @@ export class SettingsPage implements OnInit {
   isProfileSaved = signal(false);
   isSecuritySaved = signal(false);
   isPreferencesSaved = signal(false);
+  isOrgIdCopied = signal(false);
   profile = signal<SettingsProfile | null>(null);
   organization = signal<SettingsOrganization | null>(null);
 
@@ -586,5 +609,15 @@ export class SettingsPage implements OnInit {
       },
       error: () => this.isSaving.set(false),
     });
+  }
+
+  copyOrgId() {
+    const id = this.organization()?.id;
+    if (id) {
+      navigator.clipboard.writeText(id).then(() => {
+        this.isOrgIdCopied.set(true);
+        setTimeout(() => this.isOrgIdCopied.set(false), 2000);
+      });
+    }
   }
 }

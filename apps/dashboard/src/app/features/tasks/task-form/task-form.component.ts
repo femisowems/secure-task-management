@@ -15,11 +15,12 @@ import {
   TaskPriority,
   Team,
 } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-task-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   template: `
     <form [formGroup]="taskForm" (ngSubmit)="submit()" class="space-y-6">
       <div class="space-y-4">
@@ -143,28 +144,26 @@ import {
               for="assignedTeamId"
               class="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5"
             >
-              Assign to Team
-              <span class="text-xs text-slate-400 font-normal">(Optional)</span>
+              <lucide-icon name="users" [size]="16" class="text-slate-400"></lucide-icon>
+              Assignee
             </label>
             <div class="relative">
               <select
                 id="assignedTeamId"
                 formControlName="assignedTeamId"
-                class="appearance-none block w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900"
+                class="appearance-none block w-full h-11 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary transition-all text-slate-900 font-medium"
               >
-                <option [ngValue]="null">Unassigned (Personal)</option>
-                @for (team of teams; track team.id) {
-                  <option [value]="team.id">{{ team.name }}</option>
-                }
+                <option [ngValue]="null">Personal (Only Me)</option>
+                <optgroup label="Teams">
+                  @for (team of teams; track team.id) {
+                    <option [value]="team.id">{{ team.name }}</option>
+                  }
+                </optgroup>
               </select>
               <div
                 class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
               >
-                <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                  <path
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  />
-                </svg>
+                <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
               </div>
             </div>
           </div>

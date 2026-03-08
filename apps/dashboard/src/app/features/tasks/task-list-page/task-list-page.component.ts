@@ -55,8 +55,11 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
         <app-task-header
           [searchQuery]="searchQuery()"
           [categoryFilter]="categoryFilter()"
+          [teamFilter]="teamFilter()"
+          [teams]="teams()"
           (searchQueryChange)="searchQuery.set($event)"
           (categoryFilterChange)="categoryFilter.set($event)"
+          (teamFilterChange)="teamFilter.set($event)"
           (create)="openCreate()"
           (columnGuide)="toggleColumnGuideModal()"
         ></app-task-header>
@@ -72,7 +75,10 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
           </div>
         }
 
-        <app-task-analytics></app-task-analytics>
+        <app-task-analytics
+          [tasks]="filteredTasks()"
+          [activeFilterTitle]="activeFilterTitle()"
+        ></app-task-analytics>
 
         @if (shortcutService.isHelpModalOpen('shortcuts')) {
           <app-shortcuts-modal></app-shortcuts-modal>
@@ -165,6 +171,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 [canDuplicate]="canDuplicate()"
                 [canDelete]="canDelete()"
+                [teamMap]="teamMap()"
                 (taskDrop)="drop($event, TaskStatus.TODO)"
                 (edit)="openEdit($event)"
                 (duplicate)="handleDuplicate($event)"
@@ -178,6 +185,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 [canDuplicate]="canDuplicate()"
                 [canDelete]="canDelete()"
+                [teamMap]="teamMap()"
                 containerClass="bg-purple-50/40 dark:bg-purple-900/10 border-purple-100/50 dark:border-purple-800/30"
                 dotClass="bg-purple-500"
                 titleClass="text-purple-900 dark:text-purple-300"
@@ -195,6 +203,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 [canDuplicate]="canDuplicate()"
                 [canDelete]="canDelete()"
+                [teamMap]="teamMap()"
                 containerClass="bg-blue-50/40 dark:bg-blue-900/10 border-blue-100/50 dark:border-blue-800/30"
                 dotClass="bg-blue-500 animate-pulse"
                 titleClass="text-blue-900 dark:text-blue-300"
@@ -212,6 +221,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 [canDuplicate]="canDuplicate()"
                 [canDelete]="canDelete()"
+                [teamMap]="teamMap()"
                 containerClass="bg-red-50/40 dark:bg-red-900/10 border-red-100/50 dark:border-red-800/30"
                 dotClass="bg-red-500"
                 titleClass="text-red-900 dark:text-red-300"
@@ -229,6 +239,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                 [canEdit]="canEdit()"
                 [canDuplicate]="canDuplicate()"
                 [canDelete]="canDelete()"
+                [teamMap]="teamMap()"
                 containerClass="bg-green-50/40 dark:bg-green-900/10 border-green-100/50 dark:border-green-800/30"
                 dotClass="bg-green-500"
                 titleClass="text-green-900 dark:text-green-300"
@@ -248,6 +259,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
                   [canEdit]="canEdit()"
                   [canDuplicate]="canDuplicate()"
                   [canDelete]="canDelete()"
+                  [teamMap]="teamMap()"
                   containerClass="bg-slate-100/40 dark:bg-slate-900/10 border-slate-200/50 dark:border-slate-800/30"
                   dotClass="bg-slate-500"
                   titleClass="text-slate-900 dark:text-slate-300"
@@ -324,6 +336,11 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
 
   tasks = this.taskService.tasks;
   teams = signal<Team[]>([]);
+  teamMap = computed(() => {
+    const map: Record<string, string> = {};
+    this.teams().forEach(t => map[t.id] = t.name);
+    return map;
+  });
   user = this.authStore.user;
   canEdit = computed(() => !!this.user());
   canDuplicate = computed(() => !!this.user());
@@ -335,6 +352,7 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
   // Filters & Search
   searchQuery = signal('');
   categoryFilter = signal<TaskCategory | 'all'>('all');
+  teamFilter = signal<string | 'all'>('all');
   sortBy = signal<SortOption>('newest');
 
   // Computed filtered and sorted tasks
@@ -357,7 +375,13 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
       result = result.filter((t) => t.category === cat);
     }
 
-    // 3. Sorting
+    // 3. Team Filter
+    const teamId = this.teamFilter();
+    if (teamId !== 'all') {
+      result = result.filter((t) => t.assignedTeamId === teamId);
+    }
+
+    // 4. Sorting
     result = [...result].sort((a, b) => {
       switch (this.sortBy()) {
         case 'newest':
@@ -384,6 +408,28 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
     });
 
     return result;
+  });
+
+  activeFilterTitle = computed(() => {
+    const teamId = this.teamFilter();
+    const cat = this.categoryFilter();
+    const query = this.searchQuery();
+
+    if (teamId !== 'all') {
+      const teamName = this.teamMap()[teamId] || 'Team';
+      const suffix = teamName.toLowerCase().endsWith('team') ? '' : ' Team';
+      return `${teamName}${suffix}`;
+    }
+
+    if (cat !== 'all') {
+      return `${this.getCategoryLabel(cat as TaskCategory)} Tasks`;
+    }
+
+    if (query) {
+      return `Search: "${query}"`;
+    }
+
+    return 'Full Organization';
   });
 
   todoTasks = computed(() => this.filteredTasks().filter(t => t.status === TaskStatus.TODO));
@@ -491,6 +537,7 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
   resetFilters() {
     this.searchQuery.set('');
     this.categoryFilter.set('all');
+    this.teamFilter.set('all');
     this.sortBy.set('newest');
   }
 
