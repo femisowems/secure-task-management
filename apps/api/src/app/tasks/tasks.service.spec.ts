@@ -4,6 +4,7 @@ import { TasksService } from './tasks.service';
 import {
   Task,
   User,
+  Team,
 } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/data/entities';
 import { RbacService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/auth/rbac.service';
 import { OrgScopeService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/auth/org-scope.service';
@@ -28,11 +29,16 @@ describe('TasksService', () => {
     remove: jest.fn(),
   };
 
+  const mockTeamRepo = {
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TasksService,
         { provide: getRepositoryToken(Task), useValue: mockTaskRepo },
+        { provide: getRepositoryToken(Team), useValue: mockTeamRepo },
         {
           provide: RbacService,
           useValue: { canUpdateTask: jest.fn(), canDeleteTask: jest.fn() },

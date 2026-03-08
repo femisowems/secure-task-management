@@ -12,10 +12,12 @@ import {
   Task,
   AuditLog,
   Permission,
+  Team,
 } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/data/entities';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
           database: isPostgres
             ? undefined
             : process.env.DATABASE_URL || 'database.sqlite',
-          entities: [User, Organization, Task, AuditLog, Permission],
+          entities: [User, Organization, Team, Task, AuditLog, Permission],
           synchronize: true, // Only for dev!
           logging: true,
           ssl: isPostgres ? { rejectUnauthorized: false } : false,
@@ -47,6 +49,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         limit: 100,
       },
     ]),
+    TeamsModule,
   ],
   providers: [
     {

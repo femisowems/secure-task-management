@@ -30,4 +30,5 @@ export type SettingsTab =
   | 'profile'
   | 'organization'
   | 'security'
+  | 'teams'
   | 'preferences';

@@ -20,13 +20,24 @@ import { BadgeComponent, BadgeVariant } from '@fsowemimo-d8b02f8a-4412-4cf4-a953
           <app-badge [variant]="getCategoryVariant(task.category)">
             {{ task.category }}
           </app-badge>
-          @if (task.priority && task.status !== TaskStatus.COMPLETED && task.status !== TaskStatus.ARCHIVED) {
-            <span
-              [class]="'text-[10px] font-bold uppercase tracking-wider ' + getPriorityColor(task.priority)"
-            >
-              {{ task.priority }}
-            </span>
-          }
+          <div class="flex items-center gap-2">
+            @if (task.assignedTeamId) {
+              <div class="text-indigo-600 bg-indigo-50 p-1 rounded-md" title="Assigned to Team">
+                <lucide-icon name="users" [size]="14"></lucide-icon>
+              </div>
+            } @else {
+              <div class="text-slate-400 bg-slate-50 p-1 rounded-md border border-slate-100" title="Unassigned">
+                <lucide-icon name="user" [size]="14"></lucide-icon>
+              </div>
+            }
+            @if (task.priority && task.status !== TaskStatus.COMPLETED && task.status !== TaskStatus.ARCHIVED) {
+              <span
+                [class]="'text-[10px] font-bold uppercase tracking-wider ' + getPriorityColor(task.priority)"
+              >
+                {{ task.priority }}
+              </span>
+            }
+          </div>
         </div>
         <h3
           class="text-slate-900 dark:text-white font-bold leading-snug text-sm lg:text-base group-hover:text-brand-primary transition-colors"

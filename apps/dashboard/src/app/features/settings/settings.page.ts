@@ -17,11 +17,12 @@ import {
   SettingsOrganization,
 } from './settings.model';
 import { ThemeService, Theme } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/services';
+import { TeamsTabComponent } from './teams-tab.component';
 
 @Component({
   selector: 'app-settings-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, TeamsTabComponent],
   template: `
     <div class="h-full flex flex-col bg-slate-50">
       <!-- Header -->
@@ -279,6 +280,11 @@ import { ThemeService, Theme } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923
                 }
               }
 
+              <!-- Teams Tab -->
+              @if (activeTab() === 'teams') {
+                <app-teams-tab></app-teams-tab>
+              }
+
               <!-- Preferences Tab -->
               @if (activeTab() === 'preferences') {
                 <form
@@ -447,6 +453,7 @@ export class SettingsPage implements OnInit {
   tabs: { id: SettingsTab; label: string }[] = [
     { id: 'profile', label: 'Profile' },
     { id: 'organization', label: 'Organization' },
+    { id: 'teams', label: 'Teams' },
     { id: 'security', label: 'Security' },
     { id: 'preferences', label: 'Preferences' },
   ];

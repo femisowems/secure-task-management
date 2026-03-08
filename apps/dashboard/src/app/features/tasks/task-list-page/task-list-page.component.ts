@@ -21,6 +21,7 @@ import {
   TaskStatus,
   TaskCategory,
   TaskPriority,
+  Team,
 } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/models';
 import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskAnalyticsComponent } from '../../analytics/task-analytics.component';
@@ -28,6 +29,7 @@ import { ShortcutsModalComponent } from '../../../shared/components/shortcuts-mo
 import { TaskHeaderComponent } from '../components/task-header.component';
 import { TaskColumnComponent } from '../components/task-column.component';
 import { CardComponent } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/shared-ui';
+import { TeamsService } from '../../settings/teams.service';
 // KeyboardShortcutsService moved above
 
 type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
@@ -278,6 +280,7 @@ type SortOption = 'newest' | 'oldest' | 'priority' | 'title';
 
             <app-task-form
               [task]="editingTask() || undefined"
+              [teams]="teams()"
               (taskSubmit)="
                 editingTask() ? handleUpdate($event) : handleCreate($event)
               "
@@ -317,8 +320,10 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
   private authStore = inject(AuthStore);
   public shortcutService = inject(KeyboardShortcutsService);
   public uiState = inject(UiStateService);
+  private teamsService = inject(TeamsService);
 
   tasks = this.taskService.tasks;
+  teams = signal<Team[]>([]);
   user = this.authStore.user;
   canEdit = computed(() => !!this.user());
   canDuplicate = computed(() => !!this.user());
@@ -419,7 +424,15 @@ export class TaskListPageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.taskService.fetchTasks();
+    this.loadTeams();
     this.registerShortcuts();
+  }
+
+  loadTeams() {
+    this.teamsService.getTeams().subscribe({
+      next: (teams) => this.teams.set(teams),
+      error: (err) => console.error('Failed to load teams', err),
+    });
   }
 
   ngOnDestroy() {

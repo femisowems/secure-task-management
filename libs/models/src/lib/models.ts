@@ -48,6 +48,7 @@ export interface Task {
   priority: TaskPriority;
   organizationId: string;
   createdBy: string;
+  assignedTeamId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -70,4 +71,14 @@ export interface AppConfig {
   production: boolean;
   supabase: SupabaseConfig;
   apiUrl: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  organizationId: string;
+  members: User[];
+  createdAt: string;
+  updatedAt: string;
 }

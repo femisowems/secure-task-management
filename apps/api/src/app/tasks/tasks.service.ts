@@ -2,6 +2,7 @@ import {
   Injectable,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
   Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +10,7 @@ import { Repository, In } from 'typeorm';
 import {
   Task,
   User,
+  Team,
 } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/data/entities';
 import { RbacService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/auth/rbac.service';
 import { OrgScopeService } from '@fsowemimo-d8b02f8a-4412-4cf4-a953-29470923d3a8/auth/org-scope.service';
@@ -23,6 +25,8 @@ export class TasksService {
   constructor(
     @InjectRepository(Task)
     private tasksRepo: Repository<Task>,
+    @InjectRepository(Team)
+    private teamsRepo: Repository<Team>,
     @Inject(RbacService)
     private rbacService: RbacService,
     @Inject(OrgScopeService)
@@ -45,6 +49,13 @@ export class TasksService {
       throw new ForbiddenException(
         'Cannot create task in another organization',
       );
+    }
+
+    if (taskData.assignedTeamId) {
+      const team = await this.teamsRepo.findOne({
+        where: { id: taskData.assignedTeamId, organizationId: user.organizationId },
+      });
+      if (!team) throw new BadRequestException('Assigned team not found in your organization');
     }
 
     const newTask = this.tasksRepo.create({
@@ -109,6 +120,13 @@ export class TasksService {
         resourceId: `BLOCKED: Unauthorized ${id}`,
       });
       throw new ForbiddenException('Cannot update this task');
+    }
+
+    if (updateData.assignedTeamId) {
+      const team = await this.teamsRepo.findOne({
+        where: { id: updateData.assignedTeamId, organizationId: user.organizationId },
+      });
+      if (!team) throw new BadRequestException('Assigned team not found in your organization');
     }
 
     Object.assign(task, updateData);

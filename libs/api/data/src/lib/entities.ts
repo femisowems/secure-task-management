@@ -4,6 +4,8 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -41,6 +43,9 @@ export class Organization {
 
   @OneToMany(() => Task, (task) => task.organization)
   tasks!: Task[];
+
+  @OneToMany(() => Team, (team) => team.organization)
+  teams!: Team[];
 }
 
 // --------------------------------------------------
@@ -92,8 +97,50 @@ export class User {
   @JoinColumn({ name: 'organizationId' })
   organization!: Organization;
 
+  @ManyToMany(() => Team, (team) => team.members)
+  teams!: Team[];
+
   @CreateDateColumn()
   createdAt!: Date;
+}
+
+// --------------------------------------------------
+// TEAM ENTITY
+// --------------------------------------------------
+@Entity('teams')
+export class Team {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column({ type: 'text' })
+  name!: string;
+
+  @Column({ type: 'text', nullable: true })
+  description!: string | null;
+
+  @Column({ type: 'text' })
+  organizationId!: string;
+
+  @ManyToOne(() => Organization, (org) => org.teams)
+  @JoinColumn({ name: 'organizationId' })
+  organization!: Organization;
+
+  @ManyToMany(() => User, (user) => user.teams)
+  @JoinTable({
+    name: 'team_users',
+    joinColumn: { name: 'teamId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
+  })
+  members!: User[];
+
+  @OneToMany(() => Task, (task) => task.assignedTeam)
+  tasks!: Task[];
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }
 
 // --------------------------------------------------
@@ -132,6 +179,13 @@ export class Task {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'createdBy' })
   creator!: User;
+
+  @Column({ type: 'text', nullable: true })
+  assignedTeamId!: string | null;
+
+  @ManyToOne(() => Team, (team) => team.tasks)
+  @JoinColumn({ name: 'assignedTeamId' })
+  assignedTeam!: Team | null;
 
   @CreateDateColumn()
   createdAt!: Date;
