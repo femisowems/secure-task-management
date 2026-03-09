@@ -34,7 +34,6 @@ import {
   Loader2,
   Building2,
   ClipboardCheck,
-  ShieldAlert,
   CheckCircle2,
 } from 'lucide-angular';
 
@@ -86,7 +85,6 @@ export const appConfig: ApplicationConfig = {
         Loader2,
         Building2,
         ClipboardCheck,
-        ShieldAlert,
         CheckCircle2,
       }),
     },
